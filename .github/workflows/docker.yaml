@@ -20,7 +20,7 @@ jobs:
         id: check
         shell: bash
         run: |
-          TAGS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://ghcr.io/v2/Gridness/minikube/tags/list | jq -r '.tags[]')
+          TAGS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://ghcr.io/v2/Gridness/minikube/tags/list | jq -r '.tags[]?')
           LATEST_TAG=$(echo "$TAGS" | sort -V | tail -n1)
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
