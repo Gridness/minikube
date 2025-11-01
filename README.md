@@ -2,7 +2,7 @@
 This repository checks official minikube repo for new versions and automatically builds a Docker image for it. To use simply do
 
 ```bash
-docker run --priviliged -d ghcr.io/Gridness/minikube:1.37.0
+docker run --privileged -d ghcr.io/Gridness/minikube:1.37.0
 ```
 
 > [!NOTE]
