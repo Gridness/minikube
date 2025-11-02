@@ -34,12 +34,18 @@ jobs:
   build:
     name: build minikube image
     needs: check
-    if: ${{ needs.check.outputs.latest_version != needs.check.outputs.latest_tag }}
+    if: ${{ needs.check.outputs.latest_version != '' && needs.check.outputs.latest_tag != '' && needs.check.outputs.latest_version != needs.check.outputs.latest_tag }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
+      - name: Debug outputs
+        run: |
+          echo "Latest tag from registry: '${{ needs.check.outputs.latest_tag }}'"
+          echo "Latest version from minikube: '${{ needs.check.outputs.latest_version }}'"
+          echo "Are they equal? ${{ needs.check.outputs.latest_version == needs.check.outputs.latest_tag }}"
+  
       - name: checkout code
         uses: actions/checkout@v5.0.0
 
@@ -47,7 +53,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/minikube
+          images: |
+            ${{ vars.DOCKERHUB_USERNAME }}/minikube
+            ghcr.io/${{ github.repository_owner }}/minikube
           tags: |
             type=raw,value=latest
             type=raw,value=${{ needs.check.outputs.latest_version }}
@@ -56,6 +64,12 @@ jobs:
         run: |
           echo "Tags: ${{ steps.meta.outputs.tags }}"
           echo "Labels: ${{ steps.meta.outputs.labels }}"
+
+      - name: login to dockerhub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: login to ghcr
         uses: docker/login-action@v3
