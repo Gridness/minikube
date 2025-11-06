@@ -6,7 +6,7 @@ docker run --privileged -d --name minikube ghcr.io/gridness/minikube:v1.37.0
 ```
 
 > [!NOTE]
-> The image is based on `docker:28.5.1-dind`, meaning it runs on alpine linux
+> The image is based on `docker:dind`, meaning it runs on alpine linux
 
 > [!IMPORTANT]
 > Due to requirements of minikube the container is run in root mode. **Do not use it in production**
