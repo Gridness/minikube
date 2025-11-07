@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       latest_tag: ${{ steps.check.outputs.latest_tag }}
-      latest_version: ${{ steps.latest-version.outputs.tag }}
+      latest_version: ${{ steps.latest_version.outputs.tag }}
     permissions:
       contents: read
       packages: read
@@ -25,11 +25,17 @@ jobs:
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       - name: check if new minikube version is available
-        id: latest-version
+        id: latest_version
         uses: oprypin/find-latest-tag@v1
         with:
           repository: kubernetes/minikube
           releases-only: true
+
+      - name: show obtained tags
+        shell: bash
+        run: |
+          echo "Latest tag from registry: '${{ steps.check.outputs.latest_tag }}'"
+          echo "Latest version from minikube: '${{ steps.latest_version.outputs.tag }}'"
 
   build:
     name: build minikube image
@@ -40,12 +46,6 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Debug outputs
-        run: |
-          echo "Latest tag from registry: '${{ needs.check.outputs.latest_tag }}'"
-          echo "Latest version from minikube: '${{ needs.check.outputs.latest_version }}'"
-          echo "Are they equal? ${{ needs.check.outputs.latest_version == needs.check.outputs.latest_tag }}"
-  
       - name: checkout code
         uses: actions/checkout@v5.0.0
 
