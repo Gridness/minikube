@@ -22,14 +22,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TOKEN=$(echo "$GITHUB_TOKEN" | base64)
           REPO_LOWER=$(echo "${{ github.repository_owner }}/minikube" | tr '[:upper:]' '[:lower:]')
-
-          AUTH_TOKEN=$(curl -s "https://ghcr.io/token?service=ghcr.io&scope=repository:${REPO_LOWER}:pull" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" | jq -r '.token')
-
-          TAGS=$(curl -s -H "Authorization: Bearer $AUTH_TOKEN" \
-            "https://ghcr.io/v2/${REPO_LOWER}/tags/list" | jq -r '.tags[]?')
+          TAGS=$(skopeo list-tags --registry-token "${{ secrets.GITHUB_TOKEN }}" \
+            "docker://ghcr.io/${REPO_LOWER}" | jq -r '.Tags[]')
           LATEST_TAG=$(echo "$TAGS" | sort -V | tail -n1)
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
