@@ -19,8 +19,12 @@ jobs:
       - name: get existing minikube tags
         id: check
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAGS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://ghcr.io/v2/Gridness/minikube/tags/list | jq -r '.tags[]?')
+          REPO_LOWER=$(echo "${{ github.repository_owner }}/minikube" | tr '[:upper:]' '[:lower:]')
+          TAGS=$(skopeo list-tags --registry-token "${{ secrets.GITHUB_TOKEN }}" \
+            "docker://ghcr.io/${REPO_LOWER}" | jq -r '.Tags[]')
           LATEST_TAG=$(echo "$TAGS" | sort -V | tail -n1)
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
