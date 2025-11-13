@@ -19,8 +19,17 @@ jobs:
       - name: get existing minikube tags
         id: check
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAGS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://ghcr.io/v2/Gridness/minikube/tags/list | jq -r '.tags[]?')
+          TOKEN=$(echo "$GITHUB_TOKEN" | base64)
+          REPO_LOWER=$(echo "${{ github.repository_owner }}/minikube" | tr '[:upper:]' '[:lower:]')
+
+          AUTH_TOKEN=$(curl -s "https://ghcr.io/token?service=ghcr.io&scope=repository:${REPO_LOWER}:pull" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" | jq -r '.token')
+
+          TAGS=$(curl -s -H "Authorization: Bearer $AUTH_TOKEN" \
+            "https://ghcr.io/v2/${REPO_LOWER}/tags/list" | jq -r '.tags[]?')
           LATEST_TAG=$(echo "$TAGS" | sort -V | tail -n1)
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
