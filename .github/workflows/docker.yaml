@@ -4,10 +4,19 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
+    inputs:
+      tag_check:
+        description: |
+          Wether to do the tag check before build. If no new tag is available, 
+          both build and release stages will be skipped
+        required: true
+        default: true
+        type: boolean
 
 jobs:
   check:
     name: check if new version of minikube is available
+    if: ${{ inputs.tag_check }}
     runs-on: ubuntu-latest
     outputs:
       latest_tag: ${{ steps.check.outputs.latest_tag }}
@@ -44,7 +53,13 @@ jobs:
   build:
     name: build minikube image
     needs: check
-    if: ${{ needs.check.outputs.latest_version != '' && needs.check.outputs.latest_tag != '' && needs.check.outputs.latest_version != needs.check.outputs.latest_tag }}
+    if: |
+      always() && 
+      (inputs.tag_check == false || 
+       (needs.check.result == 'success' && 
+        needs.check.outputs.latest_version != '' && 
+        needs.check.outputs.latest_tag != '' && 
+        needs.check.outputs.latest_version != needs.check.outputs.latest_tag))
     runs-on: ubuntu-latest
     permissions:
       contents: read
