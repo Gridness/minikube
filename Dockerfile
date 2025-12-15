@@ -1,4 +1,4 @@
-FROM docker:29.1.2-dind
+FROM docker:29.1.3-dind
 
 ARG VERSION
 
