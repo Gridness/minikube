@@ -66,7 +66,7 @@ jobs:
       packages: write
     steps:
       - name: checkout code
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: extract docker image metadata
         id: meta
@@ -122,7 +122,7 @@ jobs:
       contents: write
     steps:
       - name: checkout code
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: publish new release
         shell: bash
